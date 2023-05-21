@@ -1,5 +1,6 @@
 from api import get_categories, get_products
 from keyboards import create_category_keyboard,remove_keyboard,main_markup
+from db import Query
 
 temp_data = {}
 
@@ -12,7 +13,7 @@ def high_controller(message, bot):
 
 
 
-    temp_data[message.chat.id] = {}
+    temp_data[message.chat.id] = {'type': message.text}
 
     bot.register_next_step_handler(message, lambda m: category_controller(m, bot))
 
@@ -40,4 +41,10 @@ def amount_controller(message, bot):
             message.chat.id,
             f"{i['title']} | {i['price']}"
         )
+    Query(
+        chat_id=message.chat.id,
+        type=temp_data[message.chat.id]['type'],
+        category=temp_data[message.chat.id]['category'],
+        amount=int(temp_data[message.chat.id]['amount'])
+    ).save()
     temp_data.pop(message.chat.id)
